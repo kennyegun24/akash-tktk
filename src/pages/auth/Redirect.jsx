@@ -12,7 +12,7 @@ const Redirect = () => {
       const code = urlSearchParams.get("code");
       if (code) {
         const makeReq = async () => {
-          const req = axios.post("https://localhost:4000/oauth/redirect", {
+          const req = axios.post("http://localhost:4000/oauth/redirect", {
             code: code,
           });
           const res = await req.data;
