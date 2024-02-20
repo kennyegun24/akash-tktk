@@ -22,7 +22,9 @@ const Redirect = () => {
           if (res) {
             dispatch(loginSuccess({ token: res.access_token }));
           }
-        } catch (error) {}
+        } catch (error) {
+          console.log(error);
+        }
       };
       makeReq();
     }
