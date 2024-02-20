@@ -8,11 +8,11 @@ const Redirect = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     const urlSearchParams = new URLSearchParams(window.location.search);
-    try {
-      const code = urlSearchParams.get("code");
-      if (code) {
-        const makeReq = async () => {
-          const req = axios.post(
+    const code = urlSearchParams.get("code");
+    if (code) {
+      const makeReq = async () => {
+        try {
+          const req = await axios.post(
             "https://akash-tktk-server.vercel.app/oauth/redirect",
             {
               code: code,
@@ -22,10 +22,10 @@ const Redirect = () => {
           if (res) {
             dispatch(loginSuccess({ token: res.access_token }));
           }
-        };
-        makeReq();
-      }
-    } catch (error) {}
+        } catch (error) {}
+      };
+      makeReq();
+    }
   }, []);
 
   return <div>Redirect page</div>;
