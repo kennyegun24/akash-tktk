@@ -10,7 +10,7 @@ const Login = () => {
       const response = await axios.get("http://localhost:4000/login");
       window.location.href = `${response.data.url}`;
     } catch (error) {
-      alert("SOMETHING WENT WRONG");
+      console.log(error);
     }
   };
   return (
