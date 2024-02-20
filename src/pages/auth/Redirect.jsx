@@ -18,7 +18,7 @@ const Redirect = () => {
           }
         );
         const res = await req.data;
-        dispatch(loginSuccess(res));
+        dispatch(loginSuccess({ token: res.access_token }));
       };
       makeReq();
     }

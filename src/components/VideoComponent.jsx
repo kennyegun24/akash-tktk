@@ -2,6 +2,8 @@ import React, { useRef, useState } from "react";
 // import video from "../assets/video1.mp4";
 import { FaPlay, FaPause } from "react-icons/fa";
 import { GrLinkNext, GrMultimedia } from "react-icons/gr";
+import { useDispatch, useSelector } from "react-redux";
+import { add_details } from "../redux/video";
 
 const VideoComponent = ({ setPage, setFileSize }) => {
   const [video, setVideo] = useState(null);
@@ -25,6 +27,24 @@ const VideoComponent = ({ setPage, setFileSize }) => {
   videoRef.current?.addEventListener("ended", () => {
     setIsPlaying(false);
   });
+
+  const dispatch = useDispatch();
+  const nextPage = () => {
+    if (video) {
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const bufferData = e.target.result;
+        dispatch(
+          add_details({
+            bufferData,
+          })
+        );
+        setPage(1);
+      };
+      reader.readAsArrayBuffer(video);
+    }
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -79,7 +99,7 @@ const VideoComponent = ({ setPage, setFileSize }) => {
         )}
       </div>
       <button
-        onClick={() => video && setPage(1)}
+        onClick={nextPage}
         className={`video_nxt_btn ${video ? "blue" : "dummy_color"}`}
       >
         <GrLinkNext />

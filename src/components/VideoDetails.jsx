@@ -1,13 +1,81 @@
-import React from "react";
+import React, { useState } from "react";
 import { GrLinkPrevious } from "react-icons/gr";
 import { FaRegPaperPlane } from "react-icons/fa";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import Loading from "./loading";
 
 const VideoDetails = ({ setPage, fileSize }) => {
+  const { video_details } = useSelector((state) => state.video);
+  const [loading, setLoading] = useState(false);
+  const [userVideoDetails, setUserVideoDetails] = useState({
+    title: "",
+    privacy_level: false,
+    disable_duet: false,
+    disable_stitch: false,
+    disable_comments: false,
+    video_cover_timestamp_ms: 1000,
+  });
+  const [resumableUrl, setResumableUrl] = useState(null);
+  const { currentUser } = useSelector((state) => state.auth);
+
+  const handleChange = (e) => {
+    setUserVideoDetails((prevDetails) => ({
+      ...prevDetails,
+      [e.target.name]: e.target.value,
+    }));
+  };
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      const initializeUploadToTiktokApi = async () => {
+        const axiosCreate = axios.create({
+          baseURL: "https://open.tiktokapis.com/v2/",
+          headers: {
+            Authorization: `Bearer ${currentUser.token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        try {
+          const req = await axiosCreate.post("/post/publish/video/init/", {
+            ...userVideoDetails,
+          });
+
+          const response = await req.data;
+          setResumableUrl(response.data.upload_url);
+
+          if (response) {
+            const axiosCreate = axios.create({
+              baseURL: resumableUrl,
+              headers: {
+                Authorization: `Bearer ${currentUser.token}`,
+                "Content-Type": "video/mp4",
+                "Content-Range": `bytes 0-${fileSize - 1}/${fileSize}`,
+              },
+            });
+            const req = await axiosCreate.post("", {
+              ...video_details.bufferData,
+            });
+          }
+          setLoading(false);
+        } catch (error) {
+          setLoading(false);
+        }
+      };
+      initializeUploadToTiktokApi();
+    } catch (error) {
+      setLoading(false);
+    }
+  };
+  console.log(video_details.bufferData);
+
   return (
     <div className="video_details flex column gap1rem">
+      {loading && <Loading />}
       <div className="dark_name">Kenny Egun</div>
       <p>File size: {(fileSize / 1000000).toFixed(2)}mb</p>
-      <form className=" flex column gap1rem">
+      <form onChange={(e) => handleChange(e)} className=" flex column gap1rem">
         <section className="flex column gap03rem">
           <label htmlFor="title">Title</label>
           <input type="text" name="title" id="title" placeholder="Title" />
@@ -51,7 +119,7 @@ const VideoDetails = ({ setPage, fileSize }) => {
         <button onClick={() => setPage(0)} className="video_back_btn">
           <GrLinkPrevious />
         </button>
-        <button onClick={() => setPage(1)} className="video_back_btn">
+        <button onClick={handleSubmit} className="video_back_btn">
           <FaRegPaperPlane />
         </button>
       </div>

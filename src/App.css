@@ -66,6 +66,8 @@
   width: 100%;
   background: rgb(43, 42, 42, 0.6);
   position: fixed;
+  top: 0;
+  left: 0;
 }
 
 .loader {
