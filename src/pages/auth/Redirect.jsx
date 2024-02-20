@@ -21,7 +21,7 @@ const Redirect = () => {
           const res = await req.data;
           console.log(res);
           if (res) {
-            dispatch(loginSuccess({ res }));
+            dispatch(loginSuccess(res));
           }
         } catch (error) {
           console.log(error);
