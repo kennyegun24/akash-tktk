@@ -7,7 +7,9 @@ const Login = () => {
   const { loginStatus } = useSelector((state) => state.auth);
   const request_token = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/login");
+      const response = await axios.get(
+        "https://akash-tktk-server.vercel.app/login"
+      );
       window.location.href = `${response.data.url}`;
     } catch (error) {
       console.log(error);
