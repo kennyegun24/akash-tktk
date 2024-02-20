@@ -18,10 +18,7 @@ function App() {
         index
         element={currentUser ? <Home /> : <Navigate to={"/login"} />}
       />
-      <Route
-        path="/oauth/redirect"
-        element={currentUser ? <Redirect /> : <Navigate to={"/login"} />}
-      />
+      <Route path="/oauth/redirect" element={<Redirect />} />
     </Routes>
   );
 }
