@@ -49,10 +49,19 @@ const VideoComponent = ({ setPage, setFileSize }) => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setVideo(file);
-    setFileSize(file?.size);
 
     const videoObjectURL = URL.createObjectURL(file);
     videoRef.current.src = videoObjectURL;
+
+    const videoElement = document.createElement("video");
+    videoElement.src = videoObjectURL;
+
+    videoElement.onloadedmetadata = () => {
+      setFileSize({
+        size: file?.size,
+        videoTime: videoElement.duration,
+      });
+    };
   };
 
   return (
