@@ -64,6 +64,9 @@ const VideoDetails = ({ setPage, fileSize }) => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(commercialAd);
+    console.log(brandType.personal);
+    console.log(brandType.others);
     const validationError = {};
     if (userVideoDetails.title.trim() === "") {
       validationError.title = "Caption is required";
@@ -71,6 +74,13 @@ const VideoDetails = ({ setPage, fileSize }) => {
       validationError.privacy = "Privacy must be set";
     } else if (fileSize.videoTime > max_video_post_duration_sec) {
       validationError.video = "Video length should not be more than 10mins";
+    } else if (
+      commercialAd === true &&
+      brandType.others === null &&
+      brandType.personal === null
+    ) {
+      validationError.commercial =
+        "You have to select either of the two commercial AD checkboxes";
     } else {
       setLoading(true);
       setTimeout(() => {
@@ -160,7 +170,7 @@ const VideoDetails = ({ setPage, fileSize }) => {
             {error?.title &&
               setTimeout(() => {
                 setError({});
-              }, 3000) && <p className="error">{error?.title}</p>}
+              }, 5000) && <p className="error">{error?.title}</p>}
           </section>
 
           <div className="flex justify_between">
@@ -174,7 +184,7 @@ const VideoDetails = ({ setPage, fileSize }) => {
               {error?.privacy &&
                 setTimeout(() => {
                   setError({});
-                }, 3000) && <p className="error">{error?.privacy}</p>}
+                }, 5000) && <p className="error">{error?.privacy}</p>}
             </section>
           </div>
 
@@ -197,7 +207,15 @@ const VideoDetails = ({ setPage, fileSize }) => {
           </section>
 
           <section className="promotion flex width100 column gap1rem">
-            <CommercialAd commercialAd={commercialAd} brandType={brandType} />
+            <CommercialAd
+              error={error.commercial}
+              commercialAd={commercialAd}
+              brandType={brandType}
+            />
+            {error.commercial &&
+              setTimeout(() => {
+                setError({});
+              }, 5000) && <p className="error">{error?.commercial}</p>}
             <button
               onClick={handleSubmit}
               className="width100 upload_btn"

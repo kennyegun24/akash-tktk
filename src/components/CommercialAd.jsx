@@ -6,7 +6,7 @@ const CommercialAd = ({ commercialAd, brandType }) => {
   const label = { inputProps: { "aria-label": "Switch demo" } };
   return (
     <>
-      <section className="flex width100 column gap05rem">
+      <section className="flex width100 column gap05rem promotion_container">
         <div className="flex align_center justify_between">
           <h4>Disclose video content</h4>
           <Switch name="ad" {...label} checked={commercialAd} />
