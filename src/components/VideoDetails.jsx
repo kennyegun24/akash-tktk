@@ -4,27 +4,35 @@ import { FaRegPaperPlane } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import Loading from "./loading";
-import Switch from "@mui/material/Switch";
 import { IoIosArrowBack } from "react-icons/io";
+import CommercialAd from "./CommercialAd";
+import VideoLengthError from "./VideoLengthError";
 
 const VideoDetails = ({ setPage, fileSize }) => {
   const { video_details } = useSelector((state) => state.video);
   const [loading, setLoading] = useState(false);
   const [resumableUrl, setResumableUrl] = useState(null);
   const { currentUser } = useSelector((state) => state.auth);
+  const [commercialAd, setCommercialAd] = useState(false);
+  const [brandType, setBrandType] = useState({
+    terms: "Music Usage Confirmation.",
+    personal: null,
+    others: null,
+  });
   const [userVideoDetails, setUserVideoDetails] = useState({
     title: "",
-    privacy_level: false,
+    privacy_level: null,
     disable_duet: currentUser?.getUserInfo?.data?.duet_disabled,
     disable_stitch: currentUser?.getUserInfo?.data?.stitch_disabled,
     disable_comments: currentUser?.getUserInfo?.data?.comment_disabled,
     video_cover_timestamp_ms: 1000,
   });
-  const label = { inputProps: { "aria-label": "Switch demo" } };
+  const [error, setError] = useState({});
+  const max_video_post_duration_sec = 600;
 
   const handleChange = (e) => {
     // const title = e.target.elements.title;
-    console.log(e.target);
+    // console.log(e.target);
     if (e.target.name === "title") {
       const title = e.target.value;
       if (title.length <= 100) {
@@ -34,6 +42,18 @@ const VideoDetails = ({ setPage, fileSize }) => {
           [e.target.name]: e.target.value,
         }));
       }
+    } else if (e.target.name === "ad") {
+      setCommercialAd((prev) => !prev);
+    } else if (e.target.name === "personal") {
+      setBrandType((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.checked,
+      }));
+    } else if (e.target.name === "others") {
+      setBrandType((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.checked,
+      }));
     } else {
       setUserVideoDetails((prevDetails) => ({
         ...prevDetails,
@@ -42,54 +62,61 @@ const VideoDetails = ({ setPage, fileSize }) => {
       }));
     }
   };
-  const handleSubmit = async () => {
-    try {
-      setLoading(true);
-      const initializeUploadToTiktokApi = async () => {
-        const axiosCreate = axios.create({
-          baseURL: "https://open.tiktokapis.com/v2/",
-          headers: {
-            Authorization: `Bearer ${currentUser?.access_token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        try {
-          const req = await axiosCreate.post("/post/publish/video/init/", {
-            ...userVideoDetails,
-          });
-
-          const response = await req.data;
-          setResumableUrl(response.data.upload_url);
-
-          if (response) {
-            const axiosCreate = axios.create({
-              baseURL: resumableUrl,
-              headers: {
-                Authorization: `Bearer ${currentUser?.access_token}`,
-                "Content-Type": "video/mp4",
-                "Content-Range": `bytes 0-${fileSize - 1}/${fileSize}`,
-              },
-            });
-            const req = await axiosCreate.post("", {
-              ...video_details.bufferData,
-            });
-          }
-          setLoading(false);
-        } catch (error) {
-          setLoading(false);
-        }
-      };
-      initializeUploadToTiktokApi();
-    } catch (error) {
-      setLoading(false);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const validationError = {};
+    if (userVideoDetails.privacy_level === null) {
+      validationError.privacy = "Privacy must be set";
     }
+    if (userVideoDetails.title.trim() === "") {
+      validationError.title = "Caption is required";
+    }
+    if (fileSize.videoTime < max_video_post_duration_sec) {
+      validationError.video = "Video length should not be more than 10mins";
+    }
+    setError(validationError);
+    // try {
+    //   setLoading(true);
+    //   const initializeUploadToTiktokApi = async () => {
+    //     const axiosCreate = axios.create({
+    //       baseURL: "https://open.tiktokapis.com/v2/",
+    //       headers: {
+    //         Authorization: `Bearer ${currentUser?.access_token}`,
+    //         "Content-Type": "application/json",
+    //       },
+    //     });
+
+    //     try {
+    //       const req = await axiosCreate.post("/post/publish/video/init/", {
+    //         ...userVideoDetails,
+    //       });
+
+    //       const response = await req.data;
+    //       setResumableUrl(response.data.upload_url);
+
+    //       if (response) {
+    //         const axiosCreate = axios.create({
+    //           baseURL: resumableUrl,
+    //           headers: {
+    //             Authorization: `Bearer ${currentUser?.access_token}`,
+    //             "Content-Type": "video/mp4",
+    //             "Content-Range": `bytes 0-${fileSize - 1}/${fileSize}`,
+    //           },
+    //         });
+    //         const req = await axiosCreate.post("", {
+    //           ...video_details.bufferData,
+    //         });
+    //       }
+    //       setLoading(false);
+    //     } catch (error) {
+    //       setLoading(false);
+    //     }
+    //   };
+    //   initializeUploadToTiktokApi();
+    // } catch (error) {
+    //   setLoading(false);
+    // }
   };
-  // console.log(video_details.bufferData);
-  const max_video_post_duration_sec = 600;
-  // console.log(fileSize);
-  if (fileSize.videoTime > max_video_post_duration_sec) {
-  }
 
   return (
     <section className="flex column gap1rem">
@@ -101,6 +128,7 @@ const VideoDetails = ({ setPage, fileSize }) => {
       </div>
       <div className="video_details flex column gap2rem">
         {loading && <Loading />}
+        {error?.video && <VideoLengthError text={error?.video} />}
         <div className="dark_name flex align_center gap05rem">
           <img
             src={currentUser?.getUserInfo?.data?.creator_avatar_url}
@@ -126,6 +154,10 @@ const VideoDetails = ({ setPage, fileSize }) => {
               />
               <p>{userVideoDetails.title.length}/100</p>
             </div>
+            {error?.title &&
+              setTimeout(() => {
+                setError({});
+              }, 3000) && <p className="error">{error?.title}</p>}
           </section>
 
           <div className="flex justify_between">
@@ -136,6 +168,10 @@ const VideoDetails = ({ setPage, fileSize }) => {
                 <option value="MUTUAL_FOLLOW_FRIENDS">Mutual Friends</option>
                 <option value="SELF_ONLY">Self</option>
               </select>
+              {error?.privacy &&
+                setTimeout(() => {
+                  setError({});
+                }, 3000) && <p className="error">{error?.privacy}</p>}
             </section>
           </div>
 
@@ -158,56 +194,16 @@ const VideoDetails = ({ setPage, fileSize }) => {
           </section>
 
           <section className="promotion flex width100 column gap1rem">
-            <section className="flex width100 column gap05rem">
-              <div className="flex align_center justify_between">
-                <h4>Disclose video content</h4>
-                <Switch {...label} />
-              </div>
-              <p>
-                Turn on to disclose that this video promotes goods or services
-                in exchange for something of value. Your video could promote
-                yourself, a thirdparty, or both
-              </p>
-            </section>
-            <section className="flex width100 column gap05rem">
-              <div className="flex align_center justify_between">
-                <h4>Your brand</h4>
-                <Switch {...label} />
-              </div>
-              <p>
-                You are promoting yourself or your own business. This video will
-                be classified as brand organic
-              </p>
-            </section>
-            <section className="flex width100 column gap05rem">
-              <div className="flex align_center justify_between">
-                <h4>Branded content</h4>
-                <Switch {...label} />
-              </div>
-              <p>
-                You are promoting another brand or a third party. This video
-                will be classified as branded organic
-              </p>
-            </section>
-            <p className="agree">
-              By posting, you agree to our{" "}
-              <a className="agree_link" href="/">
-                Music Usage Confirmation
-              </a>
-            </p>
-            <button className="width100 upload_btn" type="submit">
+            <CommercialAd commercialAd={commercialAd} brandType={brandType} />
+            <button
+              onClick={handleSubmit}
+              className="width100 upload_btn"
+              type="submit"
+            >
               Upload
             </button>
           </section>
         </form>
-        {/* <div className="flex video_details_btn_div">
-        <button onClick={() => setPage(0)} className="video_back_btn">
-          <GrLinkPrevious />
-        </button>
-        <button onClick={handleSubmit} className="video_back_btn">
-          <FaRegPaperPlane />
-        </button>
-      </div> */}
       </div>
     </section>
   );
