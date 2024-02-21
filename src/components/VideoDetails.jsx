@@ -65,14 +65,17 @@ const VideoDetails = ({ setPage, fileSize }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationError = {};
-    if (userVideoDetails.privacy_level === null) {
-      validationError.privacy = "Privacy must be set";
-    }
     if (userVideoDetails.title.trim() === "") {
       validationError.title = "Caption is required";
-    }
-    if (fileSize.videoTime < max_video_post_duration_sec) {
+    } else if (userVideoDetails.privacy_level === null) {
+      validationError.privacy = "Privacy must be set";
+    } else if (fileSize.videoTime > max_video_post_duration_sec) {
       validationError.video = "Video length should not be more than 10mins";
+    } else {
+      setLoading(true);
+      setTimeout(() => {
+        setLoading(false);
+      }, 5000);
     }
     setError(validationError);
     // try {
@@ -163,7 +166,7 @@ const VideoDetails = ({ setPage, fileSize }) => {
           <div className="flex justify_between">
             <section className="flex width100 column privacy gap03rem">
               <label htmlFor="privacy">Who can view this video?</label>
-              <select className="width100" name="" id="privacy">
+              <select className="width100" name="privacy_level" id="privacy">
                 <option value="FOLLOWER_OF_CREATOR">Follower of creator</option>
                 <option value="MUTUAL_FOLLOW_FRIENDS">Mutual Friends</option>
                 <option value="SELF_ONLY">Self</option>

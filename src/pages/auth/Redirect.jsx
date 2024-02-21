@@ -19,7 +19,7 @@ const Redirect = () => {
             }
           );
           const res = await req.data;
-          console.log(res);
+          // console.log(res);
           if (res) {
             dispatch(loginSuccess(res));
           }
