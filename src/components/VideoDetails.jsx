@@ -94,7 +94,7 @@ const VideoDetails = ({ setPage, fileSize }) => {
         "You have to select either of the two commercial AD checkboxes";
     } else {
       setLoading(true);
-
+      console.log(userVideoDetails);
       try {
         setLoading(true);
         const uploadVideo = async () => {
