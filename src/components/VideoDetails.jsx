@@ -28,6 +28,7 @@ const VideoDetails = ({ setPage, fileSize }) => {
   });
   const [error, setError] = useState({});
   const max_video_post_duration_sec = 600;
+  console.log(currentUser);
 
   const handleChange = (e) => {
     if (e.target.name === "title") {
