@@ -1,18 +1,17 @@
 import React, { useState } from "react";
-import { GrLinkPrevious } from "react-icons/gr";
-import { FaRegPaperPlane } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import Loading from "./loading";
 import { IoIosArrowBack } from "react-icons/io";
 import CommercialAd from "./CommercialAd";
 import VideoLengthError from "./VideoLengthError";
+import { useNavigate } from "react-router-dom";
 
 const VideoDetails = ({ setPage, fileSize }) => {
   const { video_details } = useSelector((state) => state.video);
   const [loading, setLoading] = useState(false);
-  const [resumableUrl, setResumableUrl] = useState(null);
   const { currentUser } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
   const [commercialAd, setCommercialAd] = useState(false);
   const [brandType, setBrandType] = useState({
     terms: "Music Usage Confirmation.",
@@ -31,8 +30,6 @@ const VideoDetails = ({ setPage, fileSize }) => {
   const max_video_post_duration_sec = 600;
 
   const handleChange = (e) => {
-    // const title = e.target.elements.title;
-    // console.log(e.target);
     if (e.target.name === "title") {
       const title = e.target.value;
       if (title.length <= 100) {
@@ -49,11 +46,27 @@ const VideoDetails = ({ setPage, fileSize }) => {
         ...prev,
         [e.target.name]: e.target.checked,
       }));
+      if (e.target.checked && brandType.others) {
+        setError((prev) => ({
+          ...prev,
+          video: "Your photo/video will be labeled as 'Paid partnership'",
+        }));
+      } else if (e.target.checked && !brandType.others) {
+        setError((prev) => ({
+          ...prev,
+          video: "Your photo/video will be labeled as Promotional content",
+        }));
+      }
     } else if (e.target.name === "others") {
       setBrandType((prev) => ({
         ...prev,
         [e.target.name]: e.target.checked,
       }));
+      if (e.target.checked)
+        setError((prev) => ({
+          ...prev,
+          video: "Your photo/video will be labeled as 'Paid partnership'",
+        }));
     } else {
       setUserVideoDetails((prevDetails) => ({
         ...prevDetails,
@@ -64,9 +77,6 @@ const VideoDetails = ({ setPage, fileSize }) => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(commercialAd);
-    console.log(brandType.personal);
-    console.log(brandType.others);
     const validationError = {};
     if (userVideoDetails.title.trim() === "") {
       validationError.title = "Caption is required";
@@ -83,52 +93,74 @@ const VideoDetails = ({ setPage, fileSize }) => {
         "You have to select either of the two commercial AD checkboxes";
     } else {
       setLoading(true);
-      setTimeout(() => {
+
+      try {
+        setLoading(true);
+        const uploadVideo = async () => {
+          try {
+            const uploadRequest = axios.create({
+              baseURL: "https://akash-tktk-server.vercel.app",
+            });
+            const req = await uploadRequest.post("", {
+              access_token: currentUser?.access_token,
+              userVideoDetails,
+              bufferData: video_details.bufferData,
+              fileSize,
+            });
+
+            validationError.video = "Video Successfully Uploaded";
+            setLoading(false);
+          } catch (error) {
+            validationError.video = "Video could not get uploaded";
+            navigate("/video/upload/success");
+            setLoading(false);
+          }
+        };
+        uploadVideo();
+        // const initializeUploadToTiktokApi = async () => {
+        //   const axiosCreate = axios.create({
+        //     baseURL: "https://open.tiktokapis.com/v2/",
+        //     headers: {
+        //       Authorization: `Bearer ${currentUser?.access_token}`,
+        //       "Content-Type": "application/json",
+        //     },
+        //   });
+
+        //   try {
+        //     const req = await axiosCreate.post("/post/publish/video/init/", {
+        //       ...userVideoDetails,
+        //     });
+
+        //     const response = await req.data;
+        //     setResumableUrl(response.data.upload_url);
+
+        //     if (response) {
+        //       const axiosCreate = axios.create({
+        //         baseURL: resumableUrl,
+        //         headers: {
+        //           Authorization: `Bearer ${currentUser?.access_token}`,
+        //           "Content-Type": "video/mp4",
+        //           "Content-Range": `bytes 0-${fileSize - 1}/${fileSize}`,
+        //         },
+        //       });
+        //       const req = await axiosCreate.post("", {
+        //         ...video_details.bufferData,
+        //       });
+        //       validationError.video = "Video Successfully Uploaded";
+        //     }
+        //     setLoading(false);
+        //   } catch (error) {
+        //     setLoading(false);
+        //     validationError.video = "Something went wrong";
+        //   }
+        // };
+        // await initializeUploadToTiktokApi();
+      } catch (error) {
+        validationError.video = "Something went wrong";
         setLoading(false);
-      }, 5000);
+      }
     }
     setError(validationError);
-    // try {
-    //   setLoading(true);
-    //   const initializeUploadToTiktokApi = async () => {
-    //     const axiosCreate = axios.create({
-    //       baseURL: "https://open.tiktokapis.com/v2/",
-    //       headers: {
-    //         Authorization: `Bearer ${currentUser?.access_token}`,
-    //         "Content-Type": "application/json",
-    //       },
-    //     });
-
-    //     try {
-    //       const req = await axiosCreate.post("/post/publish/video/init/", {
-    //         ...userVideoDetails,
-    //       });
-
-    //       const response = await req.data;
-    //       setResumableUrl(response.data.upload_url);
-
-    //       if (response) {
-    //         const axiosCreate = axios.create({
-    //           baseURL: resumableUrl,
-    //           headers: {
-    //             Authorization: `Bearer ${currentUser?.access_token}`,
-    //             "Content-Type": "video/mp4",
-    //             "Content-Range": `bytes 0-${fileSize - 1}/${fileSize}`,
-    //           },
-    //         });
-    //         const req = await axiosCreate.post("", {
-    //           ...video_details.bufferData,
-    //         });
-    //       }
-    //       setLoading(false);
-    //     } catch (error) {
-    //       setLoading(false);
-    //     }
-    //   };
-    //   initializeUploadToTiktokApi();
-    // } catch (error) {
-    //   setLoading(false);
-    // }
   };
 
   return (
@@ -141,7 +173,10 @@ const VideoDetails = ({ setPage, fileSize }) => {
       </div>
       <div className="video_details flex column gap2rem">
         {loading && <Loading />}
-        {error?.video && <VideoLengthError text={error?.video} />}
+        {error?.video &&
+          setTimeout(() => {
+            setError((prev) => ({ ...prev, video: null }));
+          }, 5000) && <VideoLengthError text={error?.video} />}
         <div className="dark_name flex align_center gap05rem">
           <img
             src={currentUser?.getUserInfo?.data?.creator_avatar_url}
