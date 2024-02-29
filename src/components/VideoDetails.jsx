@@ -243,11 +243,11 @@ const VideoDetails = ({ setPage, fileSize }) => {
             <h4>Allow users to</h4>
             <div className="flex width100 gap1rem">
               <section className="flex align_center privacy gap03rem">
-                <input type="checkbox" />{" "}
+                <input type="checkbox" name="disable_duet" />{" "}
                 <label htmlFor="disable_duet">Duet?</label>
               </section>
               <section className="flex align_center privacy gap03rem">
-                <input type="checkbox" />{" "}
+                <input type="checkbox" name="disable_stitch" />{" "}
                 <label htmlFor="disable_stitch">Stitch</label>
               </section>
               <section className="flex align_center privacy gap03rem">
