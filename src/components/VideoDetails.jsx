@@ -109,10 +109,10 @@ const VideoDetails = ({ setPage, fileSize }) => {
             });
 
             validationError.video = "Video Successfully Uploaded";
+            navigate("/video/upload/success");
             setLoading(false);
           } catch (error) {
             validationError.video = "Video could not get uploaded";
-            navigate("/video/upload/success");
             setLoading(false);
           }
         };
