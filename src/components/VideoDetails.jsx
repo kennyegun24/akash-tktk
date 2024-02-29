@@ -102,7 +102,7 @@ const VideoDetails = ({ setPage, fileSize }) => {
             const uploadRequest = axios.create({
               baseURL: "https://akash-tktk-server.vercel.app",
             });
-            const req = await uploadRequest.post("", {
+            const req = await uploadRequest.post("/upload/video", {
               access_token: currentUser?.access_token,
               userVideoDetails,
               bufferData: video_details.bufferData,
