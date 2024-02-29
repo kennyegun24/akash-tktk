@@ -12,20 +12,20 @@ function App() {
     <Routes>
       <Route
         path="/login"
-        element={!currentUser ? <Navigate to={"/"} /> : <Login />}
+        element={currentUser ? <Navigate to={"/"} /> : <Login />}
       />
       <Route
         path="/"
         index
-        element={!currentUser ? <Home /> : <Navigate to={"/login"} />}
+        element={currentUser ? <Home /> : <Navigate to={"/login"} />}
       />
       <Route
         path="/oauth/redirect"
-        element={currentUser ? <Redirect /> : <Navigate to={"/"} />}
+        element={!currentUser ? <Redirect /> : <Navigate to={"/"} />}
       />
       <Route
         path="/video/upload/success"
-        element={!currentUser ? <UploadSuccess /> : <Navigate to={"/login"} />}
+        element={currentUser ? <UploadSuccess /> : <Navigate to={"/login"} />}
       />
     </Routes>
   );
