@@ -28,7 +28,7 @@ const VideoDetails = ({ setPage, fileSize }) => {
   });
   const [error, setError] = useState({});
   const max_video_post_duration_sec = 600;
-  console.log(currentUser);
+  // console.log(currentUser);
 
   const handleChange = (e) => {
     if (e.target.name === "title") {
@@ -129,6 +129,7 @@ const VideoDetails = ({ setPage, fileSize }) => {
             setLoading(false);
           } catch (error) {
             validationError.video = "Video could not get uploaded";
+            console.log(error);
             setLoading(false);
           }
         };
