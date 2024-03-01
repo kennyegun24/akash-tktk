@@ -23,7 +23,7 @@ const VideoDetails = ({ setPage, fileSize }) => {
     privacy_level: null,
     disable_duet: currentUser?.getUserInfo?.data?.duet_disabled,
     disable_stitch: currentUser?.getUserInfo?.data?.stitch_disabled,
-    disable_comments: currentUser?.getUserInfo?.data?.comment_disabled,
+    disable_comment: currentUser?.getUserInfo?.data?.comment_disabled,
     video_cover_timestamp_ms: 1000,
   });
   const [error, setError] = useState({});
@@ -68,7 +68,7 @@ const VideoDetails = ({ setPage, fileSize }) => {
           ...prev,
           video: "Your photo/video will be labeled as 'Paid partnership'",
         }));
-    } else if (e.target.name === "disable_comments") {
+    } else if (e.target.name === "disable_comment") {
       setUserVideoDetails((prev) => ({
         ...prev,
         [e.target.name]: e.target.checked,
@@ -252,7 +252,7 @@ const VideoDetails = ({ setPage, fileSize }) => {
                 <label htmlFor="disable_stitch">Stitch</label>
               </section>
               <section className="flex align_center privacy gap03rem">
-                <input type="checkbox" name={"disable_comments"} />{" "}
+                <input type="checkbox" name={"disable_comment"} />{" "}
                 <label htmlFor="comments">Comment</label>
               </section>
             </div>
