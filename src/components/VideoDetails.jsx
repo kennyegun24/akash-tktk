@@ -100,8 +100,8 @@ const VideoDetails = ({ setPage, fileSize }) => {
       "video.mp4"
     );
     formData.append("access_token", currentUser?.access_token);
-    formData.append("userVideoDetails", userVideoDetails);
-    formData.append("fileSize", fileSize);
+    formData.append("userVideoDetails", ...userVideoDetails);
+    formData.append("fileSize", ...fileSize);
     const validationError = {};
     if (userVideoDetails.title.trim() === "") {
       validationError.title = "Caption is required";
