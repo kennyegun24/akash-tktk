@@ -130,7 +130,7 @@ const VideoDetails = ({ setPage, fileSize }) => {
               access_token: currentUser?.access_token,
               userVideoDetails,
               fileSize,
-              bufferData: formData,
+              formData,
             });
             // if (await req.data()) {
             //   const upload_vid = await axios.post(
