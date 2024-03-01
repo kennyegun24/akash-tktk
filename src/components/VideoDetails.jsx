@@ -99,6 +99,9 @@ const VideoDetails = ({ setPage, fileSize }) => {
       new Blob([video_details.bufferData], { type: "video/*" }),
       "video.mp4"
     );
+    formData.append("access_token", currentUser?.access_token);
+    formData.append("userVideoDetails", userVideoDetails);
+    formData.append("fileSize", fileSize);
     const validationError = {};
     if (userVideoDetails.title.trim() === "") {
       validationError.title = "Caption is required";
@@ -126,12 +129,10 @@ const VideoDetails = ({ setPage, fileSize }) => {
                 "Content-Type": "multipart/form-data",
               },
             });
-            const req = await uploadRequest.post("/initiate/video/upload", {
-              access_token: currentUser?.access_token,
-              userVideoDetails,
-              fileSize,
-              formData,
-            });
+            const req = await uploadRequest.post(
+              "/initiate/video/upload",
+              formData
+            );
             // if (await req.data()) {
             //   const upload_vid = await axios.post(
             //     "https://akash-tktk-server.vercel.app/upload/video/",
