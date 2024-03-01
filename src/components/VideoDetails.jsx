@@ -93,6 +93,12 @@ const VideoDetails = ({ setPage, fileSize }) => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append(
+      "video",
+      new Blob([video_details.bufferData], { type: "video/*" }),
+      "video.mp4"
+    );
     const validationError = {};
     if (userVideoDetails.title.trim() === "") {
       validationError.title = "Caption is required";
@@ -116,13 +122,26 @@ const VideoDetails = ({ setPage, fileSize }) => {
           try {
             const uploadRequest = axios.create({
               baseURL: "https://akash-tktk-server.vercel.app",
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
             });
-            const req = await uploadRequest.post("/upload/video", {
+            const req = await uploadRequest.post("/initiate/video/upload", {
               access_token: currentUser?.access_token,
               userVideoDetails,
-              bufferData: video_details.bufferData,
               fileSize,
+              bufferData: formData,
             });
+            // if (await req.data()) {
+            //   const upload_vid = await axios.post(
+            //     "https://akash-tktk-server.vercel.app/upload/video/",
+            //     ,
+            //     {
+            //       "Content-Type": "multipart/form-data",
+            //     }
+            //   );
+            //   upload_vid();
+            // }
 
             validationError.video = "Video Successfully Uploaded";
             navigate("/video/upload/success");
